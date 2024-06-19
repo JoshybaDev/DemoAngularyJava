@@ -13,10 +13,10 @@ export class RolesService {
   constructor(private http: HttpClient, private erroresService: ErroresService) { }
 
   httpOptions = {
-    headers : new HttpHeaders({"Authorization": 'Bearer "' + sessionStorage.getItem('token') + '"' })
+    headers: new HttpHeaders({ "Authorization": `Bearer ${sessionStorage.getItem('token')}` })
   };
 
   getRoles(): Observable<Rol[]> {
-    return this.http.get<Rol[]>(`${this.baseUrl}/roles`,this.httpOptions);
+    return this.http.get<Rol[]>(`${this.baseUrl}/roles`);
   }
 }

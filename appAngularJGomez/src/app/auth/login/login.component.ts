@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { LoginResponse } from '../../core/interfaces/login.interface';
@@ -23,6 +23,8 @@ export class LoginComponent {
 
   public mensajeShowStatus: Boolean = false;
   public mensajeShowData: SafeHtml = "";
+  public mensajeEmailError: SafeHtml = "";
+  public mensajePasswordError: SafeHtml = "";
 
   formlogin = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -47,7 +49,7 @@ export class LoginComponent {
             this.router.navigate([response.redirect]);
           } else {
             this.mensajeShowStatus = true
-            this.mensajeShowData = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError(response.msg, false));
+            this.mensajeShowData = this.mensajeSuccesError(response.msg, false);
             setTimeout(() => { this.mensajeShowStatus = false }, 3000);
           }
 
@@ -57,17 +59,52 @@ export class LoginComponent {
         }
       });
     }
+    else {
+      this.mensajeEmailError = this.mensajeSuccesError(this.checkErrors(form.get('email').errors), false);
+      this.mensajePasswordError = this.mensajeSuccesError(this.checkErrors(form.get('password').errors), false);
+    }
   }
 
-  MensajeSuccesError(mensaje: string, succes: Boolean = true) {
+  mensajeSuccesError(mensaje: string, succes: Boolean = true): SafeHtml {
     let tipo: string = succes == true ? 'success' : 'danger';
-    return `
+    if (mensaje == "")
+      return "";
+
+    return this.sanitizer.bypassSecurityTrustHtml(`
     <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
     ${mensaje}
     <button class="btn-close" type="button" data-dismiss="alert" aria-label="Close"></button>
     </div>
-    `;
+    `);
   }
+
+
+
+  checkErrors(errors?: ValidationErrors | null): string {
+    if (!errors) {
+      return "";
+    }
+
+    const errorsList = Object.keys(errors);
+
+    if (errorsList.includes('required')) {
+      return 'Este campo es requerido.';
+    }
+
+    if (errorsList.includes('minlength')) {
+      const min = errors!['minlength']['requiredLength'];
+      const current = errors!['minlength']['actualLength'];
+      return `Mínimo ${current}/${min} caracteres.`;
+    }
+
+    if (errorsList.includes('email')) {
+      return 'No tiene formato de correo.';
+    }
+
+    return "";
+  }
+
+
 }
 
 /*

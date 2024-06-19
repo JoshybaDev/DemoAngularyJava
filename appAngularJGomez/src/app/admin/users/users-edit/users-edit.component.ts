@@ -40,7 +40,7 @@ export class UsersEditComponent implements OnInit {
           name: this.user?.name,
           rol: this.user?.rol,
         });
-        this.srcImgPerfil = this.updateImageSrcPerfil( (this.user?.iperfil==null || this.user?.iperfil=='') ? this.srcImgBase : this.user?.iperfil);
+        this.srcImgPerfil = this.updateImageSrcPerfil((this.user?.iperfil == null || this.user?.iperfil == '') ? this.srcImgBase : this.user?.iperfil);
       });
     });
   }
@@ -89,7 +89,7 @@ export class UsersEditComponent implements OnInit {
       }).subscribe({
         next: (response: UserResponse) => {
           this.mensajeShowStatus = true
-          this.mensajeShowData = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError(response.msg));
+          this.mensajeShowData = this.mensajeSuccesError(response.msg);
           setTimeout(() => { this.mensajeShowStatus = false }, 3000);
         },
         error: (error) => {
@@ -107,7 +107,7 @@ export class UsersEditComponent implements OnInit {
       }).subscribe({
         next: (response: UserResponse) => {
           this.mensajeShowStatus = true
-          this.mensajeShowData = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError(response.msg));
+          this.mensajeShowData = this.mensajeSuccesError(response.msg);
           setTimeout(() => { this.mensajeShowStatus = false }, 3000);
         },
         error: (error) => {
@@ -121,7 +121,7 @@ export class UsersEditComponent implements OnInit {
       //Revisamos que las contraseñas sean iguales
       if (this.formUserUpdatePass.get('password').value != this.formUserUpdatePass.get('password2').value) {
         this.mensajeShowStatus2 = true
-        this.mensajeShowData2 = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError("Las contraseñas nuevas deben de ser iguales", false));
+        this.mensajeShowData2 = this.mensajeSuccesError("Las contraseñas nuevas deben de ser iguales", false);
         setTimeout(() => { this.mensajeShowStatus2 = false }, 3000);
         return;
       }
@@ -136,12 +136,12 @@ export class UsersEditComponent implements OnInit {
         next: (response: UserResponse) => {
           if (response.code == 200) {
             this.mensajeShowStatus2 = true
-            this.mensajeShowData2 = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError(response.msg, true));
+            this.mensajeShowData2 = this.mensajeSuccesError(response.msg, true);
             setTimeout(() => { this.mensajeShowStatus2 = false }, 3000);
             return;
           }
           this.mensajeShowStatus2 = true
-          this.mensajeShowData2 = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError(response.msg, false));
+          this.mensajeShowData2 = this.mensajeSuccesError(response.msg, false);
           setTimeout(() => { this.mensajeShowStatus2 = false }, 3000);
         },
         error: (error) => {
@@ -156,13 +156,13 @@ export class UsersEditComponent implements OnInit {
         const key = Object.keys(this.formUserUpdatePass.controls.password.errors);
         if (key[0] == 'minlength') {
           this.mensajeShowStatus2 = true
-          this.mensajeShowData2 = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError("Las contraseñas minimo 6 caracteres", false));
+          this.mensajeShowData2 = this.mensajeSuccesError("Las contraseñas minimo 6 caracteres", false);
           setTimeout(() => { this.mensajeShowStatus2 = false }, 3000);
           return;
         }
       }
       this.mensajeShowStatus2 = true
-      this.mensajeShowData2 = this.sanitizer.bypassSecurityTrustHtml(this.MensajeSuccesError("El password Actual es requerido y los passwords nuevos deben de ser iguales", false));
+      this.mensajeShowData2 = this.mensajeSuccesError("El password Actual es requerido y los passwords nuevos deben de ser iguales", false);
       setTimeout(() => { this.mensajeShowStatus2 = false }, 3000);
     }
   }
@@ -201,13 +201,15 @@ export class UsersEditComponent implements OnInit {
   }
 
 
-  MensajeSuccesError(mensaje: string, succes: Boolean = true) {
+  mensajeSuccesError(mensaje: string, succes: Boolean = true) {
     let tipo: string = succes == true ? 'success' : 'danger';
-    return `
+    if (mensaje == "")
+      return "";
+    return this.sanitizer.bypassSecurityTrustHtml(`
     <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
     ${mensaje}
     <button class="btn-close" type="button" data-dismiss="alert" aria-label="Close"></button>
     </div>
-    `;
+    `);
   }
 }

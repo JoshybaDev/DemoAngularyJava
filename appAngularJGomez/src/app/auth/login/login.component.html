@@ -23,10 +23,12 @@
                                             <input type="email" class="form-control form-control-user"
                                                 id="email" aria-describedby="emailHelp"
                                                 placeholder="Enter Email Address..." formControlName="email">
+                                                <div [innerHTML]="mensajeEmailError"></div>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
                                                 id="password" placeholder="Password" formControlName="password">
+                                                <div [innerHTML]="mensajePasswordError"></div>
                                         </div>
                                         <div class="form-group">
                                         </div>
